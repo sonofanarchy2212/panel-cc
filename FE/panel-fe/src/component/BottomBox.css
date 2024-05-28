@@ -1,0 +1,40 @@
+/* App.css */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.card-body {
+  padding: 20px;
+}
+
+.card-header {
+  font-size: 1rem;
+}
+
+.table-container {
+  overflow-x: auto;
+}
+
+.ant-table {
+  background-color: #000;
+}
+
+.ant-table-thead > tr > th {
+  background-color: #333;
+  color: #fff;
+}
+
+.ant-table-tbody > tr > td {
+  color: #fff;
+}
+
+.ant-btn {
+  width: 100%;
+}
+
+.ant-input,
+.ant-select,
+.ant-textarea {
+  width: 100%;
+}
