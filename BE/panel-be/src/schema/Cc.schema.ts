@@ -55,6 +55,9 @@ export class Cc extends Document {
   userAgent: string;
 
   @Prop()
+  level: string;
+
+  @Prop()
   fullname: string;
 
   @Prop()
