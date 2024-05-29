@@ -49,6 +49,9 @@ export class Cc extends Document {
   address2: string;
 
   @Prop()
+  city: string;
+
+  @Prop()
   ip: string;
 
   @Prop()
@@ -62,6 +65,9 @@ export class Cc extends Document {
 
   @Prop()
   password: string;
+
+  @Prop()
+  total_bin: string;
 
   @Prop()
   isUsed: boolean;

@@ -15,6 +15,7 @@ export class ccDTO {
     state: string;
     email: string;
     address2: string;
+    city: string;
     ip: string;
     userAgent: string;
     fullname: string;

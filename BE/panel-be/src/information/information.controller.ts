@@ -21,4 +21,12 @@ export class InformationController {
             return 'No such credit card number';
         return findCC;
     }
+
+    @Get(':bin')
+    getInfoByBin(@Param('bin') bin: string) {
+        const findCC = this.informationService.getInfoByBin(bin);
+        if(!findCC)
+            return 'No such credit card number';
+        return findCC;
+    }
 }

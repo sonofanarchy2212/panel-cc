@@ -7,11 +7,11 @@ const { Header, Content } = Layout;
 
 const App = () => {
   return (
-    <Layout>
+    <Layout style={{ background: '#f0f0f0' }}> {/* Set the background color of the Layout */}
       <Header style={{ color: 'white', textAlign: 'center', fontSize: '24px' }}>
-        Dashboard
+        NESONLAKE PANEL
       </Header>
-      <Content style={{ padding: '20px', height: '100vh' }}>
+      <Content style={{ padding: '20px', height: '100vh', margin: '30px', background: '#f0f0f0' }}> {/* Set the background color of the Content */}
         <Row gutter={[16, 16]} style={{ height: '100%' }}>
           <Col span={24} style={{ height: '30%' }}>
             <TopBox />

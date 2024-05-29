@@ -6,6 +6,8 @@ dotenv.config(); // Thêm dòng này để tải các biến môi trường từ
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  await app.listen(3000);
+  app.enableCors(); // Enable CORS for all origins
+
+  await app.listen(3001);
 }
 bootstrap();

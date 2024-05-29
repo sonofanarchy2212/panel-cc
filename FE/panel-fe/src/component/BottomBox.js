@@ -1,40 +1,60 @@
-import React from 'react';
-import { Card, Table, Tag, Space, Pagination } from 'antd';
+import React, { useState, useEffect } from 'react';
+import { Card, Table, Space, Pagination, Modal, Tag, Row, Col } from 'antd';
 
 const { Column } = Table;
 
 const BottomBox = () => {
-  const dataSource = [
-    {
-      key: '1',
-      BIN: '523914',
-      EXP: '05/2024',
-      Holder: 'Esrher',
-      City: 'Woodstock',
-      State: 'GA',
-      ZIP: '30188-3757',
-      Country: 'United States',
-      Bank: 'CAPITAL ONE, NATIONAL ASSOCIATION',
-      Price: '$27',
-    },
-    {
-      key: '2',
-      BIN: '440393',
-      EXP: '11/2024',
-      Holder: 'Marisa',
-      City: 'Marrero',
-      State: 'Louisiana',
-      ZIP: '70072',
-      Country: 'United States',
-      Bank: 'SUTTON BANK',
-      Price: '$27',
-    },
-    // Add more data objects here...
-  ];
+  const [dataSource, setDataSource] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [selectedRecord, setSelectedRecord] = useState(null);
+
+  useEffect(() => {
+    fetch('https://bc9e-51-8-81-143.ngrok-free.app/information')
+      .then(response => response.json())
+      .then(data => {
+        // Filter out unwanted fields
+        const filteredData = data.map(item => ({
+          key: item._id,
+          BIN: item.bin,
+          EXP: `${item.month}/${item.year}`,
+          Holder: item.fullname,
+          City: item.city,
+          State: item.state,
+          ZIP: item.zipcode,
+          Country: item.country,
+          Bank: item.bank,
+          Used: item.isUsed ? 'Yes' : 'No',
+          TotalBin: 'N/A', // Replace with actual value if available
+          ...item,
+        }));
+        setDataSource(filteredData);
+        setLoading(false);
+      })
+      .catch(error => {
+        console.error('Error fetching data:', error);
+        setLoading(false);
+      });
+  }, []);
+
+  const showModal = (record) => {
+    setSelectedRecord(record);
+    setIsModalVisible(true);
+  };
+
+  const handleOk = () => {
+    setIsModalVisible(false);
+    setSelectedRecord(null);
+  };
+
+  const handleCancel = () => {
+    setIsModalVisible(false);
+    setSelectedRecord(null);
+  };
 
   return (
     <Card>
-      <Table dataSource={dataSource} pagination={false}>
+      <Table dataSource={dataSource} pagination={false} loading={loading}>
         <Column title="BIN" dataIndex="BIN" key="BIN" />
         <Column title="EXP" dataIndex="EXP" key="EXP" />
         <Column title="Holder" dataIndex="Holder" key="Holder" />
@@ -43,24 +63,60 @@ const BottomBox = () => {
         <Column title="ZIP" dataIndex="ZIP" key="ZIP" />
         <Column title="Country" dataIndex="Country" key="Country" />
         <Column title="Bank" dataIndex="Bank" key="Bank" />
+        <Column 
+          title="Used" 
+          dataIndex="Used" 
+          key="Used" 
+          render={(text) => (
+            <Tag color={text === 'Yes' ? 'red' : 'green'}>
+              {text}
+            </Tag>
+          )}
+        />
+        <Column title="Total Bin" dataIndex="TotalBin" key="TotalBin" />
         <Column
-          title="Price"
+          title=""
           dataIndex="Price"
-          key="Price"
+          key=""
           render={(text, record) => (
             <Space size="middle">
               {text}
-              <a href="#">Buy</a>
+              <a onClick={() => showModal(record)}>View</a>
             </Space>
           )}
         />
       </Table>
-      <Pagination
-        className="mt-2"
-        defaultCurrent={1}
-        total={30}
-        showQuickJumper
-      />
+      <Pagination className="mt-2" defaultCurrent={1} total={30} />
+
+      {selectedRecord && (
+        <Modal
+          title="Detailed Information"
+          visible={isModalVisible}
+          onOk={handleOk}
+          onCancel={handleCancel}
+          width={1500}
+        >
+          <Row gutter={[16, 16]}>
+            <Col span={12}>
+              <p><strong>CC Number:</strong> {selectedRecord.ccnum}</p>
+              <p><strong>EXP:</strong> {selectedRecord.month}/{selectedRecord.year}</p>
+              <p><strong>CVV:</strong> {selectedRecord.cvv}</p>
+              <p><strong>Fullname:</strong> {selectedRecord.fullname}</p>
+              <p><strong>Address:</strong> {selectedRecord.address}</p>
+              <p><strong>City:</strong> {selectedRecord.city}</p>
+              <p><strong>State:</strong> {selectedRecord.state}</p>
+              <p><strong>Email:</strong> {selectedRecord.email}</p>
+              <p><strong>Phone:</strong> {selectedRecord.phone}</p>
+              <p><strong>IP:</strong> {selectedRecord.ip}</p>
+              <p><strong>Is Used:</strong> {selectedRecord.isUsed ? 'Yes' : 'No'}</p>
+              <p><strong>User Agent:</strong> {selectedRecord.userAgent}</p>
+            </Col>
+            <Col span={12} style={{ border: '1px solid #d9d9d9', padding: '16px', borderRadius: '4px' }}>
+              <p><strong>{selectedRecord.ccnum}|{selectedRecord.month}/{selectedRecord.year}|{selectedRecord.cvv}|{selectedRecord.address}|{selectedRecord.city}|{selectedRecord.state}|{selectedRecord.email}|{selectedRecord.phone}|{selectedRecord.ip}|{selectedRecord.userAgent}</strong></p>
+            </Col>
+          </Row>
+        </Modal>
+      )}
     </Card>
   );
 };
