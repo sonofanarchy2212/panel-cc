@@ -1,41 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Card, Table, Space, Pagination, Modal, Tag, Row, Col } from 'antd';
 
 const { Column } = Table;
 
-const BottomBox = () => {
-  const [dataSource, setDataSource] = useState([]);
-  const [loading, setLoading] = useState(true);
+const BottomBox = ({ dataSource, loading }) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedRecord, setSelectedRecord] = useState(null);
-
-  useEffect(() => {
-    fetch('https://bc9e-51-8-81-143.ngrok-free.app/information')
-      .then(response => response.json())
-      .then(data => {
-        // Filter out unwanted fields
-        const filteredData = data.map(item => ({
-          key: item._id,
-          BIN: item.bin,
-          EXP: `${item.month}/${item.year}`,
-          Holder: item.fullname,
-          City: item.city,
-          State: item.state,
-          ZIP: item.zipcode,
-          Country: item.country,
-          Bank: item.bank,
-          Used: item.isUsed ? 'Yes' : 'No',
-          TotalBin: 'N/A', // Replace with actual value if available
-          ...item,
-        }));
-        setDataSource(filteredData);
-        setLoading(false);
-      })
-      .catch(error => {
-        console.error('Error fetching data:', error);
-        setLoading(false);
-      });
-  }, []);
 
   const showModal = (record) => {
     setSelectedRecord(record);
@@ -63,10 +33,10 @@ const BottomBox = () => {
         <Column title="ZIP" dataIndex="ZIP" key="ZIP" />
         <Column title="Country" dataIndex="Country" key="Country" />
         <Column title="Bank" dataIndex="Bank" key="Bank" />
-        <Column 
-          title="Used" 
-          dataIndex="Used" 
-          key="Used" 
+        <Column
+          title="Used"
+          dataIndex="Used"
+          key="Used"
           render={(text) => (
             <Tag color={text === 'Yes' ? 'red' : 'green'}>
               {text}
