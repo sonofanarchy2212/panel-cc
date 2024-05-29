@@ -1,6 +1,5 @@
 import React from 'react';
 import { Card, Form, Input, Button, Row, Col, message } from 'antd';
-import axios from 'axios';
 import './TopBox.css';
 
 const { TextArea } = Input;
@@ -11,8 +10,7 @@ const TopBox = ({ setResults }) => {
   const onFinish = async (values) => {
     try {
       const bins = values.bins.split('\n').join(',');
-      const response = await axios.get(`http://localhost:3001/information/checkbin/${bins}`);
-      setResults(response.data);
+      setResults(bins); // Call the setResults function passed from App.js with the formatted bins
     } catch (error) {
       message.error('Failed to fetch data');
     }

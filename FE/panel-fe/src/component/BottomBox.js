@@ -43,6 +43,7 @@ const BottomBox = ({ dataSource, loading }) => {
             </Tag>
           )}
         />
+        <Column title="Log Date" dataIndex="createDate" key="createDate"></Column>
         <Column title="Total Bin" dataIndex="TotalBin" key="TotalBin" />
         <Column
           title=""
