@@ -7,38 +7,39 @@ import BottomBox from './component/BottomBox';
 const { Header, Content } = Layout;
 
 const App = () => {
-  const [results, setResults] = useState([]);
+  const [dataSource, setDataSource] = useState([]); // Khởi tạo dataSource trống
   const [loading, setLoading] = useState(false);
+
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      const response = await axios.get('https://bc9e-51-8-81-143.ngrok-free.app/information');
+      const data = response.data.map(item => ({
+        key: item._id,
+        BIN: item.bin,
+        EXP: `${item.month}/${item.year}`,
+        Holder: item.fullname,
+        City: item.city,
+        State: item.state,
+        ZIP: item.zipcode,
+        Country: item.country,
+        Bank: item.bank,
+        Used: item.isUsed ? 'Yes' : 'No',
+        Note: item.note,
+        TotalBin: 'N/A', // Thay thế bằng giá trị thực tế nếu có
+        ...item,
+      }));
+      setDataSource(data); // Cập nhật dataSource
+      setLoading(false);
+    } catch (error) {
+      console.error('Failed to fetch data', error);
+      setLoading(false);
+    }
+  };
 
   // Fetch initial data when the component mounts
   useEffect(() => {
-    const fetchInitialData = async () => {
-      try {
-        setLoading(true);
-        const response = await axios.get('https://bc9e-51-8-81-143.ngrok-free.app/information');
-        const data = response.data.map(item => ({
-          key: item._id,
-          BIN: item.bin,
-          EXP: `${item.month}/${item.year}`,
-          Holder: item.fullname,
-          City: item.city,
-          State: item.state,
-          ZIP: item.zipcode,
-          Country: item.country,
-          Bank: item.bank,
-          Used: item.isUsed ? 'Yes' : 'No',
-          TotalBin: 'N/A', // Replace with actual value if available
-          ...item,
-        }));
-        setResults(data);
-        setLoading(false);
-      } catch (error) {
-        console.error('Failed to fetch data', error);
-        setLoading(false);
-      }
-    };
-
-    fetchInitialData();
+    fetchData();
   }, []);
 
   const handleSearch = async (bins) => {
@@ -56,10 +57,11 @@ const App = () => {
         Country: item.country,
         Bank: item.bank,
         Used: item.isUsed ? 'Yes' : 'No',
-        TotalBin: item.total_bin, // Replace with actual value if available
+        Note: item.note,
+        TotalBin: item.total_bin, // Thay thế bằng giá trị thực tế nếu có
         ...item,
       }));
-      setResults(data);
+      setDataSource(data); // Cập nhật dataSource
       setLoading(false);
     } catch (error) {
       console.error('Failed to fetch data', error);
@@ -78,7 +80,7 @@ const App = () => {
             <TopBox setResults={handleSearch} />
           </Col>
           <Col span={24} style={{ height: '70%' }}>
-            <BottomBox dataSource={results} loading={loading} />
+            <BottomBox dataSource={dataSource} fetchData={fetchData} loading={loading} />
           </Col>
         </Row>
       </Content>

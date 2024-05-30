@@ -62,7 +62,7 @@ export class InformationService {
         cc.note = '';
         cc.isUsed = false;
         cc.bin = bin;
-        cc.total_bin = data.bins_data[0].total_bins;
+        cc.total_bin = data.total_bins;
         cc.country = data.bins_data[0].Country;
         cc.bank = data.bins_data[0].Bank;
         cc.level = data.bins_data[0].Level;
